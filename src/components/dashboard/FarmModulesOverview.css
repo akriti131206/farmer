@@ -1,0 +1,81 @@
+.farm-modules-overview .eyebrow {
+  color: var(--color-primary);
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.farm-workspace-edit {
+  color: var(--color-primary);
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+[data-theme="dark"] .farm-workspace-edit {
+  color: var(--color-primary-light);
+}
+
+.farm-module-card {
+  display: flex;
+  flex-direction: column;
+  min-height: 158px;
+}
+
+.farm-module-card-heading {
+  align-items: center;
+  display: flex;
+  gap: 9px;
+  margin-bottom: 10px;
+}
+
+.farm-module-card-heading h3 {
+  color: var(--text-primary);
+  font-size: 0.84rem;
+  font-weight: 800;
+  margin: 0;
+}
+
+.farm-module-icon {
+  align-items: center;
+  background: var(--color-mist);
+  border-radius: 11px;
+  color: var(--color-primary);
+  display: inline-flex;
+  flex: 0 0 34px;
+  height: 34px;
+  justify-content: center;
+}
+
+[data-theme="dark"] .farm-module-icon {
+  color: var(--color-primary-light);
+}
+
+.farm-module-card p {
+  color: var(--text-secondary);
+  flex: 1;
+  font-size: 0.75rem;
+  line-height: 1.45;
+  margin: 0 0 12px;
+}
+
+.farm-module-card > a {
+  align-items: center;
+  color: var(--color-primary);
+  display: flex;
+  font-size: 0.75rem;
+  font-weight: 800;
+  gap: 5px;
+  text-decoration: none;
+}
+
+[data-theme="dark"] .farm-module-card > a {
+  color: var(--color-primary-light);
+}
+
+@media (min-width: 1200px) {
+  .farm-modules-overview .col-xl {
+    flex: 1 0 0;
+  }
+}

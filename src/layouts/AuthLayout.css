@@ -1,0 +1,125 @@
+.auth-shell {
+  display: flex;
+  min-height: 100vh;
+  background: var(--bg-base);
+}
+
+.auth-brand-panel {
+  flex: 1.1;
+  position: relative;
+  overflow: hidden;
+  display: none;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 56px;
+}
+@media (min-width: 992px) { .auth-brand-panel { display: flex; } }
+
+.auth-brand-gradient {
+  position: absolute;
+  inset: 0;
+  background: var(--gradient-sunrise);
+}
+
+.auth-float-icon {
+  position: absolute;
+  font-size: 2.4rem;
+  color: rgba(255,255,255,0.35);
+}
+
+.auth-brand-content {
+  position: relative;
+  z-index: 2;
+  color: #fff;
+  max-width: 460px;
+}
+
+.auth-logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  color: #fff;
+  text-decoration: none;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.2rem;
+  margin-bottom: 40px;
+}
+.auth-logo .logo-mark {
+  width: 38px; height: 38px;
+  border-radius: 12px;
+  background: rgba(255,255,255,0.2);
+  display: flex; align-items: center; justify-content: center;
+  backdrop-filter: blur(8px);
+}
+.auth-logo b { font-weight: 800; }
+
+.auth-brand-content h2 {
+  font-size: 2.2rem;
+  font-weight: 800;
+  line-height: 1.2;
+  margin-bottom: 16px;
+}
+.auth-brand-content p {
+  font-size: 1.02rem;
+  opacity: 0.92;
+  line-height: 1.6;
+}
+
+.auth-form-panel {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 24px;
+}
+
+.auth-form-box {
+  width: 100%;
+  max-width: 400px;
+}
+
+.auth-form-box h3 {
+  font-size: 1.6rem;
+  font-weight: 800;
+  margin-bottom: 6px;
+}
+.auth-form-box .sub {
+  color: var(--text-secondary);
+  margin-bottom: 30px;
+}
+
+.auth-divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  margin: 22px 0;
+}
+.auth-divider::before, .auth-divider::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--border-glass);
+}
+
+.social-btn-row {
+  display: flex;
+  gap: 10px;
+}
+.social-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-glass);
+  background: var(--bg-glass);
+  font-weight: 600;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+.social-btn:hover { background: var(--color-mist); }

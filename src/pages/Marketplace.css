@@ -1,0 +1,12 @@
+.product-card { overflow: hidden; padding: 0; height: 100%; display: flex; flex-direction: column; }
+.product-img {
+  height: 150px;
+  display: flex; align-items: center; justify-content: center;
+  color: #fff; font-size: 2.2rem;
+  position: relative;
+}
+.product-img .avail-badge { position: absolute; top: 10px; right: 10px; }
+.product-body { padding: 16px 18px; flex: 1; display: flex; flex-direction: column; }
+.product-price { font-family: var(--font-display); font-weight: 800; color: var(--color-primary); font-size: 1.15rem; }
+[data-theme="dark"] .product-price { color: var(--color-primary-light); }
+.product-meta { font-size: 0.78rem; color: var(--text-muted); display: flex; align-items: center; gap: 6px; margin-bottom: 4px; }

@@ -1,0 +1,239 @@
+.crop-calendar-notice {
+  border: 1px solid var(--border-glass);
+  border-radius: var(--radius-md);
+  background: var(--bg-glass);
+  color: var(--text-secondary);
+  padding: 14px 16px;
+  font-size: 0.84rem;
+}
+
+.crop-calendar-alert {
+  border-left: 4px solid var(--color-sun);
+}
+
+.crop-calendar-alert.urgent {
+  border-left-color: #e26d5a;
+}
+
+.crop-calendar-alert.success {
+  border-left-color: var(--color-primary);
+}
+
+.crop-calendar-alert-title {
+  color: var(--text-primary);
+  font-weight: 700;
+  margin-bottom: 3px;
+}
+
+.crop-summary-stat {
+  color: var(--text-muted);
+  font-size: 0.76rem;
+}
+
+.crop-summary-value {
+  color: var(--text-primary);
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 800;
+  margin-top: 4px;
+}
+
+.crop-timeline {
+  position: relative;
+  padding-left: 30px;
+}
+
+.crop-timeline-item {
+  position: relative;
+  padding-bottom: 16px;
+}
+
+.crop-timeline-item:last-child {
+  padding-bottom: 0;
+}
+
+.crop-timeline-marker {
+  position: absolute;
+  left: -30px;
+  top: 20px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: var(--bg-elevated);
+  color: var(--text-muted);
+  border: 2px solid var(--border-glass);
+  z-index: 1;
+}
+
+.crop-timeline-item.current .crop-timeline-marker {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+  color: #fff;
+  box-shadow: 0 0 0 4px var(--color-mist);
+}
+
+.crop-timeline-item.complete .crop-timeline-marker {
+  background: var(--color-mist);
+  border-color: var(--color-primary-light);
+  color: var(--color-primary-dark);
+}
+
+.crop-timeline-line {
+  position: absolute;
+  top: 42px;
+  bottom: -4px;
+  left: -20px;
+  width: 2px;
+  background: var(--border-glass);
+}
+
+.crop-stage-card {
+  border: 1px solid var(--border-glass);
+}
+
+.crop-timeline-item.current .crop-stage-card {
+  border-color: var(--color-primary-light);
+}
+
+.crop-stage-title {
+  color: var(--text-primary);
+  font-family: var(--font-display);
+  font-size: 0.98rem;
+  font-weight: 800;
+  margin: 0;
+}
+
+.crop-stage-date,
+.crop-stage-day {
+  font-size: 0.75rem;
+}
+
+.crop-stage-label {
+  color: var(--color-primary-dark);
+  font-size: 0.73rem;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+[data-theme="dark"] .crop-stage-label {
+  color: var(--color-primary-light);
+}
+
+.crop-stage-list,
+.crop-stage-copy {
+  color: var(--text-secondary);
+  font-size: 0.78rem;
+  line-height: 1.55;
+  margin-bottom: 0;
+}
+
+.crop-stage-list {
+  padding-left: 17px;
+}
+
+.crop-activity-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.crop-activity-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border-glass);
+}
+
+.crop-activity-row:last-child {
+  border-bottom: 0;
+  padding-bottom: 0;
+}
+
+.crop-activity-toggle {
+  border: 0;
+  background: transparent;
+  color: var(--color-primary);
+  padding: 2px;
+  font-size: 1.1rem;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.crop-activity-toggle:hover {
+  color: var(--color-primary-dark);
+}
+
+.crop-activity-main {
+  flex: 1;
+  min-width: 0;
+}
+
+.crop-activity-title {
+  color: var(--text-primary);
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
+.crop-activity-meta {
+  align-items: center;
+  color: var(--text-muted);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  font-size: 0.71rem;
+  margin-top: 4px;
+}
+
+.crop-activity-row.is-complete .crop-activity-title {
+  color: var(--text-muted);
+  text-decoration: line-through;
+}
+
+.crop-activity-status {
+  border-radius: 999px;
+  font-size: 0.66rem;
+  font-weight: 700;
+  padding: 4px 8px;
+  white-space: nowrap;
+}
+
+.crop-activity-status.completed,
+.crop-activity-status.upcoming {
+  background: var(--color-mist);
+  color: var(--color-primary-dark);
+}
+
+.crop-activity-status.today {
+  background: rgba(245, 185, 66, 0.18);
+  color: #8d5d00;
+}
+
+.crop-activity-status.overdue {
+  background: rgba(226, 109, 90, 0.15);
+  color: #a53526;
+}
+
+@media (max-width: 575.98px) {
+  .crop-timeline {
+    padding-left: 25px;
+  }
+
+  .crop-timeline-marker {
+    left: -25px;
+  }
+
+  .crop-timeline-line {
+    left: -15px;
+  }
+
+  .crop-activity-row {
+    gap: 7px;
+  }
+
+  .crop-activity-status {
+    font-size: 0.62rem;
+    padding: 3px 6px;
+  }
+}

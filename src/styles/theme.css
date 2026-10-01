@@ -1,0 +1,148 @@
+/* ============================================================
+   AgriSense AI — shared design tokens
+   ============================================================ */
+
+:root {
+  /* --- Brand palette --- */
+  --color-primary: #185c4b;
+  --color-primary-dark: #124838;
+  --color-accent: #b9edc9;
+  --color-accent-soft: #edf9f1;
+  --color-primary-light: var(--color-accent);
+  --color-mist: #e3f3e9;
+  --color-earth: #8d6748;
+  --color-earth-light: #c9a679;
+  --color-sky: #4fb0d8;
+  --color-sky-light: #cdeefb;
+  --color-sun: #f5b942;
+
+  /* --- Neutrals (light mode) --- */
+  --bg-base: #f7f9f7;
+  --surface: #ffffff;
+  --surface-soft: #f0f5f1;
+  --color-border: #e2e8e4;
+  --color-text: #20332d;
+  --color-text-secondary: #66756f;
+  --color-muted: #89958f;
+  --bg-elevated: var(--surface);
+  --bg-glass: var(--surface-soft);
+  --bg-glass-strong: var(--surface);
+  --border-glass: var(--color-border);
+  --text-primary: var(--color-text);
+  --text-secondary: var(--color-text-secondary);
+  --text-muted: var(--color-muted);
+  --shadow-soft: 0 8px 24px rgba(32, 51, 45, 0.06);
+  --shadow-card: 0 3px 12px rgba(32, 51, 45, 0.045);
+  --shadow-lift: 0 10px 24px rgba(32, 51, 45, 0.09);
+
+  /* --- Gradients --- */
+  --gradient-hero: linear-gradient(135deg, #f5faf6 0%, #eaf6ee 100%);
+  --gradient-primary: #185c4b;
+  --gradient-sunrise: linear-gradient(120deg, #185c4b 0%, #4b8b70 100%);
+  --gradient-sky: linear-gradient(135deg, #d7eef2 0%, #eff8f7 100%);
+
+  /* --- Type --- */
+  --font-display: "Plus Jakarta Sans", "Poppins", sans-serif;
+  --font-body: "Poppins", "Plus Jakarta Sans", sans-serif;
+
+  /* --- Radius / spacing --- */
+  --radius-sm: 10px;
+  --radius-md: 12px;
+  --radius-lg: 20px;
+  --radius-xl: 24px;
+
+  /* --- Motion --- */
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --dur-fast: 0.18s;
+  --dur-med: 0.35s;
+  --dur-slow: 0.6s;
+
+  color-scheme: light;
+}
+
+[data-theme="dark"] {
+  --bg-base: #0e1712;
+  --surface: #16211a;
+  --surface-soft: #1b2921;
+  --color-border: #2c3b32;
+  --color-text: #eaf3ec;
+  --color-text-secondary: #a9bcb0;
+  --color-muted: #71827a;
+  --bg-elevated: var(--surface);
+  --bg-glass: var(--surface-soft);
+  --bg-glass-strong: var(--surface);
+  --border-glass: var(--color-border);
+  --text-primary: var(--color-text);
+  --text-secondary: var(--color-text-secondary);
+  --text-muted: var(--color-muted);
+  --shadow-soft: 0 8px 30px rgba(0, 0, 0, 0.35);
+  --shadow-card: 0 4px 18px rgba(0, 0, 0, 0.28);
+  --shadow-lift: 0 16px 40px rgba(0, 0, 0, 0.45);
+  --gradient-hero: linear-gradient(135deg, #10261a 0%, #14271e 100%);
+  --color-primary: #7fc6a1;
+  --color-primary-dark: #a4dfbb;
+  --color-accent: #315a45;
+  --color-accent-soft: #20382a;
+  --color-primary-light: #a4dfbb;
+  --color-mist: #20382a;
+  color-scheme: dark;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  background-color: var(--bg-base);
+  background-image: radial-gradient(rgba(24, 92, 75, 0.045) 0.7px, transparent 0.7px);
+  background-size: 18px 18px;
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  transition: background var(--dur-med) var(--ease-out), color var(--dur-med) var(--ease-out);
+  scroll-behavior: smooth;
+}
+
+html[data-theme="dark"],
+html[data-theme="dark"] body {
+  background-image: radial-gradient(rgba(127, 198, 161, 0.035) 0.7px, transparent 0.7px);
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-display);
+  letter-spacing: -0.02em;
+}
+
+::selection {
+  background: var(--color-primary);
+  color: #fff;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background: #a8cdb7;
+  border-radius: 8px;
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Visible focus ring for accessibility */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}

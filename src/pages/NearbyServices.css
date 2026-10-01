@@ -1,0 +1,65 @@
+.nearby-services-notice {
+  background: rgba(79, 176, 216, 0.12);
+  border: 1px solid rgba(79, 176, 216, 0.3);
+  border-radius: var(--radius-md);
+  color: var(--text-secondary);
+  font-size: 0.82rem;
+  line-height: 1.55;
+  padding: 13px 16px;
+}
+
+.nearby-filter-label {
+  color: var(--text-secondary);
+  display: block;
+  font-size: 0.74rem;
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+
+.nearby-search {
+  position: relative;
+}
+
+.nearby-search svg {
+  color: var(--text-muted);
+  left: 14px;
+  position: absolute;
+  top: 14px;
+}
+
+.nearby-search .field-input {
+  padding-left: 40px;
+}
+
+.nearby-service-card h2 {
+  color: var(--text-primary);
+  font-size: 1.02rem;
+  font-weight: 800;
+  margin: 0 0 14px;
+}
+
+.nearby-service-detail {
+  align-items: flex-start;
+  color: var(--text-secondary);
+  display: flex;
+  font-size: 0.8rem;
+  gap: 8px;
+  line-height: 1.5;
+  margin-bottom: 9px;
+}
+
+.nearby-service-detail svg {
+  flex: 0 0 auto;
+  margin-top: 3px;
+}
+
+.nearby-distance {
+  color: var(--color-primary);
+  font-size: 0.78rem;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+[data-theme="dark"] .nearby-distance {
+  color: var(--color-primary-light);
+}

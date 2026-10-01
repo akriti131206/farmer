@@ -1,0 +1,125 @@
+.farm-calculator-disclaimer,
+.calculator-input-hint {
+  background: var(--bg-glass);
+  border: 1px solid var(--border-glass);
+  border-radius: var(--radius-sm);
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+  line-height: 1.55;
+  padding: 11px 14px;
+}
+
+.calculator-input-hint {
+  background: rgba(245, 185, 66, 0.12);
+  border-color: rgba(245, 185, 66, 0.35);
+}
+
+.calculator-input-wrap {
+  position: relative;
+}
+
+.calculator-input-wrap .field-input {
+  padding-right: 48px;
+}
+
+.calculator-input-suffix {
+  color: var(--text-muted);
+  font-size: 0.76rem;
+  pointer-events: none;
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.calculator-field-help {
+  color: var(--text-muted);
+  font-size: 0.7rem;
+  line-height: 1.4;
+  margin-top: 4px;
+}
+
+.farm-calculator-summary-heading {
+  color: var(--text-primary);
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  font-weight: 800;
+  margin: 4px 0 0;
+}
+
+.farm-calculator-total .stat-value {
+  font-size: clamp(1.1rem, 2vw, 1.55rem);
+  overflow-wrap: anywhere;
+}
+
+.calculator-breakdown-row,
+.calculator-expense-topline {
+  align-items: center;
+  color: var(--text-secondary);
+  display: flex;
+  font-size: 0.82rem;
+  gap: 12px;
+  justify-content: space-between;
+}
+
+.calculator-breakdown-row {
+  border-bottom: 1px solid var(--border-glass);
+  padding: 12px 0;
+}
+
+.calculator-breakdown-row:first-of-type {
+  padding-top: 0;
+}
+
+.calculator-breakdown-row b,
+.calculator-expense-topline b {
+  color: var(--text-primary);
+  text-align: right;
+  white-space: nowrap;
+}
+
+.calculator-expense-row {
+  margin-bottom: 14px;
+}
+
+.calculator-expense-track {
+  background: var(--color-mist);
+  border-radius: 999px;
+  height: 6px;
+  margin-top: 6px;
+  overflow: hidden;
+}
+
+.calculator-expense-fill {
+  background: var(--gradient-primary);
+  border-radius: inherit;
+  height: 100%;
+  min-width: 0;
+  transition: width var(--dur-med) var(--ease-out);
+}
+
+.calculator-investment-row {
+  border-bottom: 0;
+  border-top: 1px solid var(--border-glass);
+  font-weight: 700;
+  margin-top: 4px;
+}
+
+.calculator-formulas {
+  color: var(--text-secondary);
+  display: grid;
+  font-size: 0.76rem;
+  gap: 6px;
+  line-height: 1.5;
+}
+
+.calculator-formulas b {
+  color: var(--text-primary);
+}
+
+@media (max-width: 575.98px) {
+  .calculator-breakdown-row,
+  .calculator-expense-topline {
+    font-size: 0.75rem;
+  }
+}

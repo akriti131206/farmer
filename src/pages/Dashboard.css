@@ -1,0 +1,351 @@
+.dash-card-title {
+  font-weight: 700;
+  font-size: 0.98rem;
+  margin-bottom: 4px;
+}
+.dash-card-sub { color: var(--text-muted); font-size: 0.78rem; }
+
+.quick-action-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 16px 10px;
+  border-radius: var(--radius-md);
+  background: var(--bg-glass);
+  border: 1px solid var(--border-glass);
+  text-decoration: none;
+  color: var(--text-primary);
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-align: center;
+  transition: all var(--dur-fast);
+}
+.quick-action-btn:hover {
+  background: var(--gradient-primary);
+  color: #fff;
+  transform: translateY(-3px);
+}
+.quick-action-btn .qa-icon { font-size: 1.3rem; }
+
+.activity-row {
+  display: flex;
+  gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border-glass);
+}
+.activity-row:last-child { border-bottom: none; }
+.activity-dot {
+  width: 34px; height: 34px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.95rem;
+  color: #fff;
+}
+
+.weather-hero {
+  background: var(--gradient-sky);
+  color: #fff;
+  border-radius: var(--radius-lg);
+  padding: 22px;
+  position: relative;
+  overflow: hidden;
+}
+.weather-hero .weather-temp {
+  font-family: var(--font-display);
+  font-size: 2.4rem;
+  font-weight: 800;
+}
+
+.ai-suggestion-card {
+  background: var(--gradient-primary);
+  color: #fff;
+  border-radius: var(--radius-lg);
+  padding: 22px;
+  position: relative;
+  overflow: hidden;
+}
+
+.health-summary {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+.health-score-ring {
+  width: 88px;
+  height: 88px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: conic-gradient(var(--color-primary) 0 87%, rgba(46, 125, 50, 0.1) 87% 100%);
+  position: relative;
+  flex-shrink: 0;
+}
+
+.health-score-ring::before {
+  content: "";
+  position: absolute;
+  inset: 11px;
+  border-radius: 50%;
+  background: var(--bg-glass-strong);
+}
+
+.health-score-ring span {
+  position: relative;
+  z-index: 1;
+  font-weight: 800;
+  font-size: 1.15rem;
+  font-family: var(--font-display);
+}
+
+.health-summary-list {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.health-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.86rem;
+}
+
+.health-row b {
+  margin-left: auto;
+}
+
+.legend-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.recommendation-highlight {
+  padding: 14px;
+  border-radius: var(--radius-md);
+  background: var(--bg-glass);
+  border: 1px solid var(--border-glass);
+  margin-bottom: 14px;
+}
+
+.pill-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.74rem;
+  font-weight: 700;
+  background: rgba(79, 176, 216, 0.12);
+  color: var(--color-primary-dark);
+  border-radius: 999px;
+  padding: 6px 10px;
+  margin-bottom: 10px;
+}
+
+.recommendation-title {
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+
+.recommendation-highlight p {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 0.82rem;
+  line-height: 1.5;
+}
+
+.mini-metrics {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.mini-metrics div {
+  background: var(--bg-glass);
+  border: 1px solid var(--border-glass);
+  border-radius: var(--radius-sm);
+  padding: 10px 12px;
+}
+
+.mini-metrics span {
+  display: block;
+  color: var(--text-muted);
+  font-size: 0.7rem;
+  margin-bottom: 4px;
+}
+
+.mini-metrics strong {
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.dashboard-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.rain-alert-box {
+  margin-top: 18px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.76rem;
+  font-weight: 700;
+  background: rgba(255, 255, 255, 0.16);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 999px;
+  padding: 8px 10px;
+}
+
+.task-list,
+.analysis-list,
+.alert-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.task-item,
+.analysis-item,
+.alert-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border-glass);
+}
+
+.task-item:last-child,
+.analysis-item:last-child,
+.alert-item:last-child {
+  border-bottom: none;
+}
+
+.task-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 12px;
+  display: grid;
+  place-items: center;
+  background: rgba(79, 176, 216, 0.12);
+  color: var(--color-primary);
+  flex-shrink: 0;
+}
+
+.task-main,
+.analysis-item > div:first-child {
+  flex: 1;
+}
+
+.task-title,
+.analysis-crop {
+  font-weight: 700;
+  font-size: 0.88rem;
+}
+
+.task-meta,
+.analysis-disease,
+.alert-detail {
+  color: var(--text-secondary);
+  font-size: 0.75rem;
+}
+
+.task-priority {
+  font-size: 0.66rem;
+  font-weight: 700;
+  border-radius: 999px;
+  padding: 5px 8px;
+}
+
+.task-priority.high {
+  background: rgba(211, 47, 47, 0.1);
+  color: #c62828;
+}
+
+.task-priority.medium {
+  background: rgba(245, 185, 66, 0.14);
+  color: #a86b0a;
+}
+
+.analysis-item {
+  justify-content: space-between;
+}
+
+.analysis-meta {
+  text-align: right;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 0.74rem;
+}
+
+.analysis-meta span {
+  font-weight: 700;
+}
+
+.analysis-meta em {
+  color: var(--text-muted);
+  font-style: normal;
+}
+
+.alert-item {
+  align-items: flex-start;
+}
+
+.alert-icon {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  color: #fff;
+  font-size: 0.8rem;
+}
+
+.alert-item.warning .alert-icon {
+  background: #f5b942;
+}
+
+.alert-item.info .alert-icon {
+  background: #4fb0d8;
+}
+
+.alert-item.success .alert-icon {
+  background: #2e7d32;
+}
+
+.alert-title {
+  font-weight: 700;
+  font-size: 0.82rem;
+}
+
+.scheme-card {
+  padding: 18px 16px;
+  border-radius: var(--radius-md);
+  background: var(--bg-glass);
+  border: 1px solid var(--border-glass);
+  height: 100%;
+}
+
+.scheme-name {
+  font-weight: 800;
+  font-size: 1rem;
+  margin: 12px 0 8px;
+}
+
+.scheme-card p {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 0.78rem;
+  line-height: 1.5;
+}
