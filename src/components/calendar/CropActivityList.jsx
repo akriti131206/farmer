@@ -9,7 +9,7 @@ const statusLabels = {
   upcoming: "Upcoming",
 };
 
-export default function CropActivityList({ title, items, completedIds, onToggle, emptyText }) {
+export default function CropActivityList({ title, items, completedIds, onToggle, emptyText, savingId }) {
   return (
     <GlassCard className="p-4 h-100" hoverable={false}>
       <div className="d-flex justify-content-between align-items-center gap-2 mb-3">
@@ -29,6 +29,7 @@ export default function CropActivityList({ title, items, completedIds, onToggle,
                   type="button"
                   className="crop-activity-toggle"
                   onClick={() => onToggle(item.id)}
+                  disabled={savingId === item.id}
                   aria-label={`${complete ? "Mark incomplete" : "Mark complete"}: ${item.title}`}
                   aria-pressed={complete}
                 >

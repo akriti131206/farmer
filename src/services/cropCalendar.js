@@ -80,7 +80,7 @@ function getCompletionKey(user, crop, sowingDate) {
   return `${COMPLETION_PREFIX}:${encodeURIComponent(String(identity).toLowerCase())}:${encodeURIComponent(crop)}:${sowingDate}`;
 }
 
-export function getCompletedCalendarActivities(user, crop, sowingDate) {
+export function getLegacyCompletedCalendarActivities(user, crop, sowingDate) {
   if (!user || !crop || !sowingDate) return [];
   const raw = window.localStorage.getItem(getCompletionKey(user, crop, sowingDate));
   if (!raw) return [];
@@ -93,11 +93,4 @@ export function getCompletedCalendarActivities(user, crop, sowingDate) {
   } catch (error) {
     throw new Error("Saved crop calendar activity could not be read.", { cause: error });
   }
-}
-
-export function saveCompletedCalendarActivities(user, crop, sowingDate, completedIds) {
-  window.localStorage.setItem(
-    getCompletionKey(user, crop, sowingDate),
-    JSON.stringify([...new Set(completedIds)])
-  );
 }

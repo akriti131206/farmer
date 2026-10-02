@@ -37,23 +37,25 @@ function createForm(user, profile) {
 
 export default function Profile() {
   const { user, setUser } = useAuth();
-  const { profile, loadError, updateFarmProfile } = useFarmProfile();
+  const { profile, loading, loadError, updateFarmProfile } = useFarmProfile();
   const { pushToast } = useUI();
   const [editing, setEditing] = useState(!profile);
   const [form, setForm] = useState(() => createForm(user, profile));
   const [errors, setErrors] = useState({});
+  const [isSaving, setIsSaving] = useState(false);
   const [contact, setContact] = useState({
-    farmName: user?.farmName || "Green Valley Farm",
+    farmName: profile?.farmName || "",
     email: user?.email || "",
-    phone: "+91 98765 43210",
+    phone: profile?.phone || "",
   });
 
   useEffect(() => {
     setForm(createForm(user, profile));
     setContact((current) => ({
       ...current,
-      farmName: user?.farmName || current.farmName,
+      farmName: profile?.farmName || current.farmName,
       email: user?.email || current.email,
+      phone: profile?.phone || current.phone,
     }));
   }, [user, profile]);
 
@@ -62,7 +64,7 @@ export default function Profile() {
     setErrors((current) => ({ ...current, [field]: "" }));
   }
 
-  function save(e) {
+  async function save(e) {
     e.preventDefault();
     const nextErrors = validateFarmProfile(form);
     setErrors(nextErrors);
@@ -71,13 +73,37 @@ export default function Profile() {
       return;
     }
 
+    setIsSaving(true);
     try {
-      const savedProfile = updateFarmProfile(form);
-      setUser({ ...user, name: savedProfile.farmerName, farmName: contact.farmName, email: contact.email });
+      const savedProfile = await updateFarmProfile({
+        farmerName: form.farmerName,
+        state: form.state,
+        district: form.district,
+        village: form.village,
+        crop: form.crop,
+        landArea: form.landArea,
+        landAreaUnit: form.landAreaUnit,
+        sowingDate: form.sowingDate,
+        irrigationType: form.irrigationType,
+        soilType: form.soilType,
+        preferredLanguage: form.preferredLanguage,
+        phone: contact.phone,
+        farmName: contact.farmName,
+      });
+      
+      setUser({
+        ...user,
+        name: savedProfile.farmerName,
+        farmName: contact.farmName,
+        email: contact.email,
+      });
       setEditing(false);
       pushToast("Farm profile updated successfully");
     } catch (error) {
+      console.error("Error saving farm profile:", error);
       pushToast(error.message || "Farm profile could not be saved.", "error");
+    } finally {
+      setIsSaving(false);
     }
   }
 
@@ -122,6 +148,18 @@ export default function Profile() {
 
   const location = [profile?.village, profile?.district, profile?.state].filter(Boolean).join(", ");
   const languageLabel = languages.find(([value]) => value === profile?.preferredLanguage)?.[1];
+
+  // Show loading state while profile is being fetched
+  if (loading) {
+    return (
+      <div>
+        <PageHeading eyebrow="Account" title="My Profile & Farm" subtitle="Manage your farmer details and the farm information used to personalize AgriSense." />
+        <div className="alert alert-info" role="alert">
+          Loading your profile and farm information...
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div>
@@ -209,8 +247,8 @@ export default function Profile() {
               </div>
               {editing && (
                 <div className="d-flex gap-2 mt-3">
-                  <Button type="submit"><FiSave /> Save Farm Profile</Button>
-                  {profile && <Button type="button" variant="ghost" onClick={() => { setForm(createForm(user, profile)); setErrors({}); setEditing(false); }}>Cancel</Button>}
+                  <Button type="submit" disabled={isSaving || loading}>{isSaving ? "Saving..." : <><FiSave /> Save Farm Profile</>}</Button>
+                  {profile && <Button type="button" variant="ghost" onClick={() => { setForm(createForm(user, profile)); setErrors({}); setEditing(false); }} disabled={isSaving}>Cancel</Button>}
                 </div>
               )}
             </form>

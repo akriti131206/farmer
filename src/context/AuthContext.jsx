@@ -1,66 +1,116 @@
 import { createContext, useContext, useEffect, useState } from "react";
+import { supabase } from "../lib/supabase";
+import { getSession, signIn, signOut, signUp } from "../services/authService";
 
 const AuthContext = createContext(null);
 
-const STORAGE_KEY = "agrisense-user";
+function mapAuthUser(authUser) {
+  if (!authUser) return null;
+  const name = authUser.user_metadata?.full_name
+    || authUser.user_metadata?.name
+    || authUser.email?.split("@")[0]
+    || "Farmer";
+
+  return {
+    id: authUser.id,
+    name,
+    email: authUser.email || "",
+    farmName: authUser.user_metadata?.farm_name || "",
+    avatar: authUser.user_metadata?.avatar_url || null,
+    role: "Farm Owner",
+  };
+}
 
 export function AuthProvider({ children }) {
-  const [user, setUser] = useState(() => {
-    try {
-      const raw = window.localStorage.getItem(STORAGE_KEY);
-      return raw ? JSON.parse(raw) : null;
-    } catch {
-      return null;
-    }
-  });
-  const [loading, setLoading] = useState(false);
+  const [authUser, setAuthUser] = useState(null);
+  const [displayOverrides, setDisplayOverrides] = useState({});
+  const [loading, setLoading] = useState(true);
+  const user = authUser ? { ...authUser, ...displayOverrides } : null;
 
   useEffect(() => {
-    if (user) {
-      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(user));
-    } else {
-      window.localStorage.removeItem(STORAGE_KEY);
+    let mounted = true;
+    let authEventObserved = false;
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      authEventObserved = true;
+      if (mounted) {
+        setAuthUser(mapAuthUser(session?.user || null));
+        setDisplayOverrides({});
+        setLoading(false);
+      }
+    });
+
+    getSession()
+      .then(({ session }) => {
+        if (!mounted || authEventObserved) return;
+        setAuthUser(mapAuthUser(session?.user || null));
+        setDisplayOverrides({});
+      })
+      .catch((error) => {
+        if (mounted && !authEventObserved) {
+          console.error("Could not restore the Supabase authentication session.", error);
+          setAuthUser(null);
+        }
+      })
+      .finally(() => {
+        if (mounted) setLoading(false);
+      });
+
+    return () => {
+      mounted = false;
+      subscription?.unsubscribe();
+    };
+  }, []);
+
+  async function login(email, password) {
+    setLoading(true);
+    try {
+      const { user: signedInUser } = await signIn({ email, password });
+      setAuthUser(mapAuthUser(signedInUser));
+      setDisplayOverrides({});
+      return signedInUser;
+    } finally {
+      setLoading(false);
     }
-  }, [user]);
+  }
 
-  // Mock network delay to feel like a real auth call
-  const login = (email) =>
-    new Promise((resolve) => {
-      setLoading(true);
-      setTimeout(() => {
-        const mockUser = {
-          id: "usr_001",
-          name: email.split("@")[0].replace(/[._]/g, " ") || "Farmer",
-          email,
-          farmName: "Green Valley Farm",
-          avatar: null,
-          role: "Farm Owner",
-        };
-        setUser(mockUser);
-        setLoading(false);
-        resolve(mockUser);
-      }, 900);
+  async function register(name, email, password) {
+    setLoading(true);
+    try {
+      const result = await signUp({ fullName: name, email, password });
+      if (result.session?.user) {
+        setAuthUser(mapAuthUser(result.session.user));
+        setDisplayOverrides({});
+      }
+      return result;
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function logout() {
+    setLoading(true);
+    try {
+      await signOut();
+      setAuthUser(null);
+      setDisplayOverrides({});
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  function setUser(update) {
+    if (!authUser) return;
+    const currentUser = { ...authUser, ...displayOverrides };
+    const nextUser = typeof update === "function" ? update(currentUser) : update;
+    if (!nextUser || nextUser.id !== authUser.id) return;
+    setDisplayOverrides({
+      name: nextUser.name,
+      email: nextUser.email,
+      farmName: nextUser.farmName,
     });
-
-  const register = (name, email) =>
-    new Promise((resolve) => {
-      setLoading(true);
-      setTimeout(() => {
-        const mockUser = {
-          id: "usr_" + Math.floor(Math.random() * 9000 + 1000),
-          name,
-          email,
-          farmName: "New Farm",
-          avatar: null,
-          role: "Farm Owner",
-        };
-        setUser(mockUser);
-        setLoading(false);
-        resolve(mockUser);
-      }, 900);
-    });
-
-  const logout = () => setUser(null);
+  }
 
   return (
     <AuthContext.Provider value={{ user, loading, login, register, logout, setUser }}>

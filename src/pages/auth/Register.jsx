@@ -12,12 +12,29 @@ export default function Register() {
   const navigate = useNavigate();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [confirmationMessage, setConfirmationMessage] = useState("");
 
   async function handleSubmit(e) {
     e.preventDefault();
-    await register(name || "New Farmer", email || "farmer@agrisense.ai");
-    pushToast("Account created — welcome to AgriSense AI!");
-    navigate("/dashboard");
+    setError("");
+    setConfirmationMessage("");
+    try {
+      const result = await register(name, email, password);
+      if (!result.session) {
+        setConfirmationMessage("Account created. Please check your email to confirm your account before signing in.");
+        return;
+      }
+      pushToast("Account created — welcome to AgriSense AI!");
+      navigate("/dashboard");
+    } catch (authError) {
+      setError(authError.message || "Registration could not be completed. Please try again.");
+    }
+  }
+
+  function showProviderUnavailable(provider) {
+    setError(`${provider} sign-up is not configured yet. Use your name, email, and password.`);
   }
 
   return (
@@ -29,6 +46,9 @@ export default function Register() {
     >
       <h3>Create your account</h3>
       <p className="sub">Set up your farm profile in under a minute.</p>
+
+      {error && <div className="alert alert-danger py-2" role="alert">{error}</div>}
+      {confirmationMessage && <div className="alert alert-success py-2" role="status">{confirmationMessage}</div>}
 
       <form onSubmit={handleSubmit}>
         <div className="field-group">
@@ -66,7 +86,15 @@ export default function Register() {
           <label className="field-label">Password</label>
           <div style={{ position: "relative" }}>
             <FiLock style={{ position: "absolute", left: 14, top: 14, color: "var(--text-muted)" }} />
-            <input type="password" className="field-input" style={{ paddingLeft: 40 }} placeholder="Create a password" />
+            <input
+              type="password"
+              className="field-input"
+              style={{ paddingLeft: 40 }}
+              placeholder="Create a password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+            />
           </div>
         </div>
 
@@ -77,10 +105,10 @@ export default function Register() {
 
       <div className="auth-divider">or sign up with</div>
       <div className="social-btn-row">
-        <button className="social-btn" onClick={handleSubmit} type="button">
+        <button className="social-btn" onClick={() => showProviderUnavailable("Google")} type="button">
           <FcGoogle size={18} /> Google
         </button>
-        <button className="social-btn" onClick={handleSubmit} type="button">
+        <button className="social-btn" onClick={() => showProviderUnavailable("Phone OTP")} type="button">
           📱 Phone OTP
         </button>
       </div>

@@ -12,12 +12,22 @@ export default function Login() {
   const navigate = useNavigate();
   const [email, setEmail] = useState("farmer@agrisense.ai");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
 
   async function handleSubmit(e) {
     e.preventDefault();
-    await login(email || "farmer@agrisense.ai");
-    pushToast("Welcome back! Logged in successfully.");
-    navigate("/dashboard");
+    setError("");
+    try {
+      await login(email, password);
+      pushToast("Welcome back! Logged in successfully.");
+      navigate("/dashboard");
+    } catch (authError) {
+      setError(authError.message || "Login could not be completed. Please try again.");
+    }
+  }
+
+  function showProviderUnavailable(provider) {
+    setError(`${provider} sign-in is not configured yet. Use your email and password.`);
   }
 
   return (
@@ -29,6 +39,8 @@ export default function Login() {
     >
       <h3>Welcome back</h3>
       <p className="sub">Log in to check on your fields today.</p>
+
+      {error && <div className="alert alert-danger py-2" role="alert">{error}</div>}
 
       <form onSubmit={handleSubmit}>
         <div className="field-group">
@@ -63,6 +75,7 @@ export default function Login() {
               placeholder="••••••••"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+              required
             />
           </div>
         </div>
@@ -74,10 +87,10 @@ export default function Login() {
 
       <div className="auth-divider">or continue with</div>
       <div className="social-btn-row">
-        <button className="social-btn" onClick={handleSubmit} type="button">
+        <button className="social-btn" onClick={() => showProviderUnavailable("Google")} type="button">
           <FcGoogle size={18} /> Google
         </button>
-        <button className="social-btn" onClick={handleSubmit} type="button">
+        <button className="social-btn" onClick={() => showProviderUnavailable("Phone OTP")} type="button">
           📱 Phone OTP
         </button>
       </div>

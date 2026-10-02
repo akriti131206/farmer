@@ -21,6 +21,9 @@ import { currentWeather, weeklyForecast } from "../data/weather";
 import { monthlyExpenses, cropHealthSplit } from "../data/analytics";
 import { governmentSchemeRecords } from "../data/governmentSchemes";
 import { diagnosisHistory } from "../data/diseases";
+import { getMyCrop, getCalendarActivities } from "../services/cropCalendarService";
+import { getMyDiaryEntries } from "../services/farmDiaryService";
+import { getInventoryItems } from "../services/inventoryService";
 import "./Dashboard.css";
 
 const quickActions = [
@@ -50,12 +53,6 @@ const irrigationRecommendation = {
   method: "Drip + mulch",
 };
 
-const upcomingTasks = [
-  { title: "Inspect tomato leaves in Plot 5", due: "Today, 4:00 PM", priority: "High" },
-  { title: "Apply nitrogen dose to rice plot", due: "Tomorrow, 8:00 AM", priority: "Medium" },
-  { title: "Harvest wheat from Plot 1", due: "Thu, 9:00 AM", priority: "Medium" },
-];
-
 const importantAlerts = [
   { title: "Disease risk alert", detail: "Early blight signs noticed on tomato leaves in Plot 5.", type: "warning" },
   { title: "Water stress", detail: "Soil moisture in Plot 2 is 18% below target for maize.", type: "info" },
@@ -64,13 +61,155 @@ const importantAlerts = [
 
 const schemeSuggestions = governmentSchemeRecords.slice(0, 3);
 
+function getLocalDateKey(date) {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
+async function getUpcomingFarmTasks() {
+  const crop = await getMyCrop();
+  if (!crop?.id) return [];
+
+  const activities = await getCalendarActivities(crop.id);
+  const today = getLocalDateKey(new Date());
+
+  return activities
+    .filter((activity) => activity.completed === false && activity.activity_date >= today)
+    .sort((a, b) => a.activity_date.localeCompare(b.activity_date))
+    .slice(0, 5);
+}
+
+function formatActivityDate(dateString) {
+  const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(dateString || "");
+  if (!match) return dateString || "";
+
+  const [, year, month, day] = match;
+  return new Intl.DateTimeFormat(undefined, { month: "short", day: "numeric" })
+    .format(new Date(Number(year), Number(month) - 1, Number(day)));
+}
+
+function buildMonthlyExpenseSummary(entries, today = new Date()) {
+  const months = Array.from({ length: 6 }, (_, index) => {
+    const date = new Date(today.getFullYear(), today.getMonth() - 5 + index, 1);
+    const key = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
+    return {
+      key,
+      month: new Intl.DateTimeFormat(undefined, { month: "short", year: "2-digit" }).format(date),
+      expense: 0,
+    };
+  });
+  const monthsByKey = new Map(months.map((month) => [month.key, month]));
+  let total = 0;
+  let entryCount = 0;
+
+  entries.forEach((entry) => {
+    const month = monthsByKey.get(String(entry.date || "").slice(0, 7));
+    const expense = Number(entry.expense);
+    if (!month || !Number.isFinite(expense)) return;
+
+    month.expense += expense;
+    total += expense;
+    entryCount += 1;
+  });
+
+  return { months, total, entryCount };
+}
+
 export default function Dashboard() {
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
+  const userId = user?.id;
   const [loading, setLoading] = useState(true);
+  const [taskState, setTaskState] = useState({ items: [], loading: true, error: "" });
+  const [expenseState, setExpenseState] = useState({
+    months: [],
+    total: 0,
+    entryCount: 0,
+    loading: true,
+    error: "",
+  });
+  const [inventoryState, setInventoryState] = useState({
+    itemCount: 0,
+    lowStockCount: 0,
+    loading: true,
+    error: "",
+  });
+
   useEffect(() => {
     const t = setTimeout(() => setLoading(false), 700);
     return () => clearTimeout(t);
   }, []);
+
+  useEffect(() => {
+    if (authLoading) return undefined;
+
+    if (!userId) {
+      setTaskState({ items: [], loading: false, error: "Sign in to load farm tasks." });
+      setExpenseState({ months: [], total: 0, entryCount: 0, loading: false, error: "Sign in to load expenses." });
+      setInventoryState({ itemCount: 0, lowStockCount: 0, loading: false, error: "Sign in to load inventory." });
+      return undefined;
+    }
+
+    let active = true;
+    setTaskState((current) => ({ ...current, loading: true, error: "" }));
+    setExpenseState((current) => ({ ...current, loading: true, error: "" }));
+    setInventoryState((current) => ({ ...current, loading: true, error: "" }));
+
+    Promise.allSettled([
+      getUpcomingFarmTasks(),
+      getMyDiaryEntries(),
+      getInventoryItems(userId),
+    ]).then(([tasksResult, diaryResult, inventoryResult]) => {
+      if (!active) return;
+
+      if (tasksResult.status === "fulfilled") {
+        setTaskState({ items: tasksResult.value, loading: false, error: "" });
+      } else {
+        console.error("Could not load upcoming farm tasks on the Dashboard.", tasksResult.reason);
+        setTaskState({ items: [], loading: false, error: "Upcoming farm tasks could not be loaded." });
+      }
+
+      if (diaryResult.status === "fulfilled") {
+        setExpenseState({
+          ...buildMonthlyExpenseSummary(diaryResult.value),
+          loading: false,
+          error: "",
+        });
+      } else {
+        console.error("Could not load farm diary expenses on the Dashboard.", diaryResult.reason);
+        setExpenseState({
+          months: [],
+          total: 0,
+          entryCount: 0,
+          loading: false,
+          error: "Farm diary expenses could not be loaded.",
+        });
+      }
+
+      if (inventoryResult.status === "fulfilled") {
+        const items = inventoryResult.value;
+        setInventoryState({
+          itemCount: items.length,
+          lowStockCount: items.filter((item) => item.stock < item.threshold).length,
+          loading: false,
+          error: "",
+        });
+      } else {
+        console.error("Could not load inventory summary on the Dashboard.", inventoryResult.reason);
+        setInventoryState({
+          itemCount: 0,
+          lowStockCount: 0,
+          loading: false,
+          error: "Inventory summary could not be loaded.",
+        });
+      }
+    });
+
+    return () => {
+      active = false;
+    };
+  }, [authLoading, userId]);
 
   if (loading) {
     return (
@@ -111,6 +250,38 @@ export default function Dashboard() {
         </div>
         <div className="col-6 col-lg-3">
           <StatTile icon={<FiUsers />} iconBg="linear-gradient(135deg,#8d6748,#c9a679)" label="Workers Active Today" value={4} trend="2 booked tomorrow" delay={0.18} />
+        </div>
+      </div>
+
+      <div className="row g-3 mt-1">
+        <div className="col-12">
+          <GlassCard className="p-3" hoverable={false}>
+            <div className="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+              <div>
+                <div className="dash-card-title mb-1">Inventory Summary</div>
+                {inventoryState.error ? (
+                  <div className="text-muted-soft" role="alert">{inventoryState.error}</div>
+                ) : inventoryState.loading ? (
+                  <div className="text-muted-soft" role="status">Loading inventory summary…</div>
+                ) : inventoryState.itemCount === 0 ? (
+                  <div className="text-muted-soft">No inventory items yet.</div>
+                ) : null}
+              </div>
+              <div className="d-flex align-items-center gap-4">
+                <div>
+                  <div className="text-dim" style={{ fontSize: "0.72rem" }}>Items</div>
+                  <strong>{inventoryState.loading || inventoryState.error ? "—" : inventoryState.itemCount}</strong>
+                </div>
+                <div>
+                  <div className="text-dim" style={{ fontSize: "0.72rem" }}>Low stock</div>
+                  <strong>{inventoryState.loading || inventoryState.error ? "—" : inventoryState.lowStockCount}</strong>
+                </div>
+                <Link to="/inventory" className="text-dim dashboard-link">
+                  View inventory <FiArrowRight />
+                </Link>
+              </div>
+            </div>
+          </GlassCard>
         </div>
       </div>
 
@@ -201,19 +372,36 @@ export default function Dashboard() {
           <GlassCard className="p-4 h-100">
             <div className="d-flex justify-content-between align-items-center mb-3">
               <div className="dash-card-title">Upcoming Farm Tasks</div>
-              <span className="badge-agri badge-info">3 items</span>
+              <span className="badge-agri badge-info">
+                {taskState.loading
+                  ? "Loading…"
+                  : taskState.error
+                    ? "Unavailable"
+                    : `${taskState.items.length} ${taskState.items.length === 1 ? "task" : "tasks"}`}
+              </span>
             </div>
             <div className="task-list">
-              {upcomingTasks.map((task) => (
-                <div key={task.title} className="task-item">
+              {taskState.loading ? (
+                <div className="text-muted-soft" role="status">Loading upcoming farm tasks…</div>
+              ) : taskState.error ? (
+                <div className="text-muted-soft" role="alert">{taskState.error}</div>
+              ) : taskState.items.length === 0 ? (
+                <div className="text-muted-soft">No upcoming farm tasks</div>
+              ) : taskState.items.map((task) => (
+                <div key={task.id} className="task-item">
                   <div className="task-icon">
                     <FiCalendar />
                   </div>
                   <div className="task-main">
-                    <div className="task-title">{task.title}</div>
-                    <div className="task-meta">{task.due}</div>
+                    <div className="task-title">{task.activity_name}</div>
+                    <div className="task-meta">
+                      {formatActivityDate(task.activity_date)}
+                      {task.stage_name ? ` · ${task.stage_name}` : ""}
+                    </div>
                   </div>
-                  <span className={`task-priority ${task.priority.toLowerCase()}`}>{task.priority}</span>
+                  {task.activity_category && (
+                    <span className="badge-agri badge-info">{task.activity_category}</span>
+                  )}
                 </div>
               ))}
             </div>
@@ -299,34 +487,47 @@ export default function Dashboard() {
           <GlassCard className="p-4 h-100">
             <div className="d-flex justify-content-between align-items-start flex-wrap gap-2 mb-3">
               <div>
-                <div className="dash-card-title">Revenue vs Expenses</div>
-                <div className="dash-card-sub">Last 6 months</div>
+                <div className="dash-card-title">Farm Diary Expenses</div>
+                <div className="dash-card-sub">
+                  Last 6 months · {expenseState.loading || expenseState.error
+                    ? "Total unavailable"
+                    : `₹${expenseState.total.toLocaleString("en-IN")} recorded`}
+                </div>
               </div>
-              <div className="d-flex gap-2">
-                <span className="badge-agri badge-success">Revenue</span>
-                <span className="badge-agri badge-warning">Expenses</span>
-              </div>
+              <span className="badge-agri badge-warning">Expenses</span>
             </div>
-            <ResponsiveContainer width="100%" height={260}>
-              <AreaChart data={monthlyExpenses}>
-                <defs>
-                  <linearGradient id="rev" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#2e7d32" stopOpacity={0.35} />
-                    <stop offset="100%" stopColor="#2e7d32" stopOpacity={0} />
-                  </linearGradient>
-                  <linearGradient id="exp" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#f5b942" stopOpacity={0.35} />
-                    <stop offset="100%" stopColor="#f5b942" stopOpacity={0} />
-                  </linearGradient>
-                </defs>
-                <CartesianGrid strokeDasharray="3 3" stroke="var(--border-glass)" vertical={false} />
-                <XAxis dataKey="month" tick={{ fontSize: 12, fill: "var(--text-muted)" }} axisLine={false} tickLine={false} />
-                <YAxis tick={{ fontSize: 12, fill: "var(--text-muted)" }} axisLine={false} tickLine={false} />
-                <Tooltip contentStyle={{ borderRadius: 12, border: "1px solid var(--border-glass)", fontSize: 13 }} />
-                <Area type="monotone" dataKey="revenue" stroke="#2e7d32" strokeWidth={2.5} fill="url(#rev)" />
-                <Area type="monotone" dataKey="expense" stroke="#f5b942" strokeWidth={2.5} fill="url(#exp)" />
-              </AreaChart>
-            </ResponsiveContainer>
+            {expenseState.loading ? (
+              <div className="d-flex align-items-center justify-content-center text-muted-soft" style={{ height: 260 }} role="status">
+                Loading farm diary expenses…
+              </div>
+            ) : expenseState.error ? (
+              <div className="d-flex align-items-center justify-content-center text-muted-soft" style={{ height: 260 }} role="alert">
+                {expenseState.error}
+              </div>
+            ) : expenseState.entryCount === 0 ? (
+              <div className="d-flex align-items-center justify-content-center text-muted-soft" style={{ height: 260 }}>
+                No diary expenses recorded in the last 6 months.
+              </div>
+            ) : (
+              <ResponsiveContainer width="100%" height={260}>
+                <AreaChart data={expenseState.months}>
+                  <defs>
+                    <linearGradient id="exp" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor="#f5b942" stopOpacity={0.35} />
+                      <stop offset="100%" stopColor="#f5b942" stopOpacity={0} />
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" stroke="var(--border-glass)" vertical={false} />
+                  <XAxis dataKey="month" tick={{ fontSize: 12, fill: "var(--text-muted)" }} axisLine={false} tickLine={false} />
+                  <YAxis tick={{ fontSize: 12, fill: "var(--text-muted)" }} axisLine={false} tickLine={false} />
+                  <Tooltip
+                    formatter={(value) => [`₹${Number(value).toLocaleString("en-IN")}`, "Expenses"]}
+                    contentStyle={{ borderRadius: 12, border: "1px solid var(--border-glass)", fontSize: 13 }}
+                  />
+                  <Area type="monotone" dataKey="expense" stroke="#f5b942" strokeWidth={2.5} fill="url(#exp)" />
+                </AreaChart>
+              </ResponsiveContainer>
+            )}
           </GlassCard>
         </div>
 

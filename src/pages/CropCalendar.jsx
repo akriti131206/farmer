@@ -27,7 +27,16 @@ function getDaysUntil(date, today) {
 }
 
 export default function CropCalendar() {
-  const { profile, calendar, completedActivities, toggleActivity, loadError } = useCropCalendar();
+  const {
+    profile,
+    profileLoading,
+    calendar,
+    completedActivities,
+    toggleActivity,
+    loading,
+    savingActivityId,
+    loadError,
+  } = useCropCalendar();
   const { pushToast } = useUI();
   const today = new Date();
 
@@ -45,9 +54,9 @@ export default function CropCalendar() {
   const upcomingReminder = todayAndUpcoming[0] || null;
   const reminderDays = upcomingReminder ? getDaysUntil(upcomingReminder.date, today) : null;
 
-  function markActivity(activityId) {
+  async function markActivity(activityId) {
     try {
-      toggleActivity(activityId);
+      await toggleActivity(activityId);
     } catch (error) {
       pushToast(error.message || "Could not update activity.", "error");
     }
@@ -64,7 +73,13 @@ export default function CropCalendar() {
 
       <FarmModulesNav />
 
-      {!profile ? (
+      {loadError && <div className="alert alert-warning" role="alert">{loadError}</div>}
+
+      {profileLoading || loading ? (
+        <GlassCard className="p-4" hoverable={false}>
+          <p className="text-muted-soft mb-0">Loading your crop calendar...</p>
+        </GlassCard>
+      ) : !profile ? (
         <GlassCard className="p-4" hoverable={false}>
           <div className="d-flex align-items-start gap-3">
             <FiCalendar size={24} color="var(--color-primary)" />
@@ -93,8 +108,6 @@ export default function CropCalendar() {
       ) : (
         <>
           <FarmProfileSummary title="Calendar farm profile" compact />
-
-          {loadError && <div className="alert alert-warning" role="alert">{loadError}</div>}
 
           <GlassCard className="p-4 mb-3" hoverable={false}>
             <div className="row g-3 align-items-center">
@@ -169,6 +182,7 @@ export default function CropCalendar() {
                 completedIds={completedActivities}
                 onToggle={markActivity}
                 emptyText="No pending activities are scheduled for today or the coming days."
+                savingId={savingActivityId}
               />
             </div>
             <div className="col-lg-5">
@@ -178,6 +192,7 @@ export default function CropCalendar() {
                 completedIds={completedActivities}
                 onToggle={markActivity}
                 emptyText="Activities you mark complete will appear here."
+                savingId={savingActivityId}
               />
             </div>
           </div>
